@@ -12,7 +12,7 @@ local teamCheck = false
 
 -- Initialize the Rayfield library and create the main window
 local Window = Rayfield:CreateWindow({
-    Name = "Legend Hub [Ware Tycoon] | by lg0_",
+    Name = "Legend Hub | Ware Tycoon",
     LoadingTitle = "Legend Hub",
     LoadingSubtitle = "by lg0_",
     ConfigurationSaving = {
@@ -33,7 +33,7 @@ local Window = Rayfield:CreateWindow({
         FileName = "Key",
         SaveKey = true,
         GrabKeyFromSite = false,
-        Key = {"1"}
+        Key = {"123"}
     }
 })
 
