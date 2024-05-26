@@ -1,19 +1,16 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local ESP = {
-    loop = nil,
-    highlightLoop = nil,
-    highlights = {},
-    ShowDistance = false
-}
+-- ESP and Aimbot settings
+local ESP = {Enabled = false, ShowDistance = false, highlights = {}}
+local AimbotFovEnabled = false
+local FOVring, aimbotLoop
+local fov = 150
+local smoothing = 1
+local sensitivity = 1
+local aimPart = "Head"  -- Default aim part
+local teamCheck = false
 
-local Aimbot = {
-    Enabled = false,
-    TeamCheck = false,
-    AimPart = "Head",
-    Sensitivity = 0.1
-}
-
+-- Initialize the Rayfield library and create the main window
 local Window = Rayfield:CreateWindow({
     Name = "Legend Hub [Ware Tycoon] | by lg0_",
     LoadingTitle = "Legend Hub",
@@ -40,10 +37,12 @@ local Window = Rayfield:CreateWindow({
     }
 })
 
-local MainTab = Window:CreateTab("Main", 4483362458)
-local MainSection = MainTab:CreateSection("Main")
+local MainTab = Window:CreateTab("Main")
+local ESPTab = Window:CreateTab("ESP")
+local AimbotTab = Window:CreateTab("Aimbot")
 
-local Slider = MainTab:CreateSlider({
+-- Walk Speed and Jump Power Sliders
+MainTab:CreateSlider({
     Name = "Walk Speed",
     Range = {0, 200},
     Increment = 1,
@@ -55,7 +54,7 @@ local Slider = MainTab:CreateSlider({
     end,
 })
 
-local Slider = MainTab:CreateSlider({
+MainTab:CreateSlider({
     Name = "Jump Power",
     Range = {0, 200},
     Increment = 1,
@@ -67,8 +66,9 @@ local Slider = MainTab:CreateSlider({
     end,
 })
 
+-- NoClip Toggle
 local NoClipEnabled = false
-local ToggleNoClip = MainTab:CreateToggle({
+MainTab:CreateToggle({
     Name = "NoClip",
     CurrentValue = false,
     Flag = "Toggle3",
@@ -94,17 +94,16 @@ local ToggleNoClip = MainTab:CreateToggle({
     end,
 })
 
--- ESP
-local ESPTab = Window:CreateTab("ESP", 4483362458) -- Title, Image
-local ESPSection = ESPTab:CreateSection("ESP")
-
+-- ESP Toggle and Highlight
+local ESPEnabled = false
 local ESPLabels = {}
+local ESPColor = Color3.fromRGB(255, 255, 255)
 
 local function CreateESPLabel(Player)
     local Label = Drawing.new("Text")
     Label.Text = Player.Name
     Label.Size = 20
-    Label.Color = Color3.fromRGB(255, 255, 255)
+    Label.Color = ESPColor
     Label.Visible = true
     Label.Center = true
     Label.Outline = false
@@ -164,8 +163,7 @@ function ESP:stop()
     ESPLabels = {}
 end
 
-local ESPEnabled = false
-local ToggleESP = ESPTab:CreateToggle({
+ESPTab:CreateToggle({
     Name = "ESP",
     CurrentValue = false,
     Flag = "Toggle2",
@@ -179,11 +177,12 @@ local ToggleESP = ESPTab:CreateToggle({
     end,
 })
 
-local ESPColorPicker = ESPTab:CreateColorPicker({
+ESPTab:CreateColorPicker({
     Name = "ESP Color",
-    Color = Color3.fromRGB(255, 255, 255),
+    Color = ESPColor,
     Flag = "ColorPicker1",
     Callback = function(Value)
+        ESPColor = Value
         for _, Label in pairs(ESPLabels) do
             Label.Color = Value
         end
@@ -192,31 +191,6 @@ local ESPColorPicker = ESPTab:CreateColorPicker({
 
 local HighlightEnabled = false
 local HighlightColor = Color3.fromRGB(255, 0, 0)
-local ToggleHighlight = ESPTab:CreateToggle({
-    Name = "Highlight",
-    CurrentValue = false,
-    Flag = "Toggle3",
-    Callback = function(Value)
-        HighlightEnabled = Value
-        if Value then
-            ESP:highlightStart()
-        else
-            ESP:highlightStop()
-        end
-    end,
-})
-
-local HighlightColorPicker = ESPTab:CreateColorPicker({
-    Name = "Highlight Color",
-    Color = HighlightColor,
-    Flag = "ColorPicker2",
-    Callback = function(Value)
-        HighlightColor = Value
-        for _, Highlight in pairs(ESP.highlights) do
-            Highlight.FillColor = Value
-        end
-    end,
-})
 
 function ESP:highlightStart()
     ESP:highlightStop()
@@ -248,139 +222,186 @@ function ESP:highlightStop()
     ESP.highlights = {}
 end
 
-local ShowDistance = false
-local ToggleDistance = ESPTab:CreateToggle({
-    Name = "Show Distance",
+ESPTab:CreateToggle({
+    Name = "Highlight",
     CurrentValue = false,
-    Flag = "Toggle4",
+    Flag = "Toggle3",
     Callback = function(Value)
-        ShowDistance = Value
-        ESP.ShowDistance = Value
+        HighlightEnabled = Value
+        if Value then
+            ESP:highlightStart()
+        else
+            ESP:highlightStop()
+        end
     end,
 })
 
+ESPTab:CreateColorPicker({
+    Name = "Highlight Color",
+    Color = HighlightColor,
+    Flag = "ColorPicker2",
+    Callback = function(Value)
+        HighlightColor = Value
+        for _, Highlight in pairs(ESP.highlights) do
+            Highlight.FillColor = Value
+        end
+    end,
+})
 
-local AimbotTab = Window:CreateTab("Aimbot", 4483362458) -- Title, Image
-local AimbotSection = AimbotTab:CreateSection("Aimbot Settings")
+-- Aimbot with FOV Implementation
+local function initializeAimbotWithFOV()
+    FOVring = Drawing.new("Circle")
+    FOVring.Visible = true
+    FOVring.Thickness = 1.5
+    FOVring.Radius = fov
+    FOVring.Transparency = 1
+    FOVring.Color = Color3.fromRGB(255, 128, 128)
+    FOVring.Position = workspace.CurrentCamera.ViewportSize / 2
 
+    aimbotLoop = game:GetService("RunService").RenderStepped:Connect(function()
+        local UserInputService = game:GetService("UserInputService")
+        local pressed = UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
+        local cam = workspace.CurrentCamera
+        local zz = workspace.CurrentCamera.ViewportSize / 2
 
--- Aimbot Integration
-_G.AimbotEnabled = Aimbot.Enabled
-_G.TeamCheck = Aimbot.TeamCheck
-_G.AimPart = Aimbot.AimPart
-_G.Sensitivity = Aimbot.Sensitivity
-
-local function GetClosestPlayer()
-    local closestPlayer = nil
-    local shortestDistance = math.huge
-
-    for _, player in ipairs(game.Players:GetPlayers()) do
-        if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            if _G.TeamCheck and player.Team == game.Players.LocalPlayer.Team then
-                continue
+        if AimbotFovEnabled and pressed then
+            local curTar = getClosest(cam.CFrame)
+            if curTar then
+                local aimPos = curTar.Character[aimPart].Position
+                local ssHeadPoint = cam:WorldToScreenPoint(aimPos)
+                ssHeadPoint = Vector2.new(ssHeadPoint.X, ssHeadPoint.Y)
+                if (ssHeadPoint - zz).Magnitude < fov then
+                    local targetCFrame = CFrame.new(cam.CFrame.Position, aimPos)
+                    workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Lerp(targetCFrame, smoothing * sensitivity)
+                end
             end
+        end
 
-            local distance = (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-            if distance < shortestDistance then
-                closestPlayer = player
-                shortestDistance = distance
+        if UserInputService:IsKeyDown(Enum.KeyCode.Delete) then
+            aimbotLoop:Disconnect()
+            FOVring:Remove()
+        end
+    end)
+end
+
+local function getClosest(cframe)
+    local ray = Ray.new(cframe.Position, cframe.LookVector).Unit
+    local target = nil
+    local mag = math.huge
+
+    for i, v in pairs(game.Players:GetPlayers()) do
+        if v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= game.Players.LocalPlayer and (v.Team ~= game.Players.LocalPlayer.Team or (not teamCheck)) then
+            local aimPos = v.Character[aimPart].Position
+            local magBuf = (aimPos - ray:ClosestPoint(aimPos)).Magnitude
+
+            if magBuf < mag then
+                mag = magBuf
+                target = v
             end
         end
     end
 
-    return closestPlayer
+    return target
 end
 
-local function AimAt(Player)
-    if Player and Player.Character then
-        local AimPart = Player.Character:FindFirstChild(_G.AimPart)
-        if AimPart then
-            local aim
-local aimPos = AimPart.Position
-            local cam = workspace.CurrentCamera
-            local startPos = cam.CFrame.Position
-            local endPos = aimPos
+local function initializeAimbotWithFOV()
+    FOVring = Drawing.new("Circle")
+    FOVring.Visible = true
+    FOVring.Thickness = 1.5
+    FOVring.Radius = fov
+    FOVring.Transparency = 1
+    FOVring.Color = Color3.fromRGB(255, 128, 128)
+    FOVring.Position = workspace.CurrentCamera.ViewportSize / 2
 
-            -- Calculate the new CFrame with sensitivity
-            local direction = (endPos - startPos).unit
-            local newCFrame = CFrame.new(startPos, startPos + direction * _G.Sensitivity)
-            cam.CFrame = newCFrame
+    aimbotLoop = game:GetService("RunService").RenderStepped:Connect(function()
+        local UserInputService = game:GetService("UserInputService")
+        local pressed = UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
+        local cam = workspace.CurrentCamera
+        local zz = workspace.CurrentCamera.ViewportSize / 2
+
+        if AimbotFovEnabled and pressed then
+            local curTar = getClosest(cam.CFrame)
+            if curTar then
+                local aimPos = curTar.Character[aimPart].Position
+                local ssHeadPoint = cam:WorldToScreenPoint(aimPos)
+                ssHeadPoint = Vector2.new(ssHeadPoint.X, ssHeadPoint.Y)
+                if (ssHeadPoint - zz).Magnitude < fov then
+                    local targetCFrame = CFrame.new(cam.CFrame.Position, aimPos)
+                    workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Lerp(targetCFrame, smoothing * sensitivity)
+                end
+            end
         end
-    end
+
+        if UserInputService:IsKeyDown(Enum.KeyCode.Delete) then
+            aimbotLoop:Disconnect()
+            FOVring:Remove()
+        end
+    end)
 end
 
--- RightClick Function
-local HoldingRightClick = false
-
-local function onInputBegan(input, gameProcessed)
-    if gameProcessed then return end
-    if input.UserInputType == Enum.UserInputType.MouseButton2 then
-        HoldingRightClick = true
-    end
-end
-
-local function onInputEnded(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton2 then
-        HoldingRightClick = false
-    end
-end
-
-game:GetService("UserInputService").InputBegan:Connect(onInputBegan)
-game:GetService("UserInputService").InputEnded:Connect(onInputEnded)
-
-
-
-local AimbotToggle = AimbotTab:CreateToggle({
-    Name = "Aimbot",
-    CurrentValue = _G.AimbotEnabled,
-    Flag = "Toggle5",
+-- Aimbot Tab Controls
+AimbotTab:CreateToggle({
+    Name = "Aimbot with Fov",
+    CurrentValue = false,
+    Flag = "ToggleAimbotFov",
     Callback = function(Value)
-        _G.AimbotEnabled = Value
+        AimbotFovEnabled = Value
+        if Value then
+            initializeAimbotWithFOV()
+        else
+            if aimbotLoop then aimbotLoop:Disconnect() end
+            if FOVring then FOVring:Remove() end
+        end
     end,
 })
 
-
-local TeamCheckToggle = AimbotTab:CreateToggle({
-    Name = "Team Check",
-    CurrentValue = _G.TeamCheck,
-    Flag = "Toggle6",
+AimbotTab:CreateSlider({
+    Name = "FOV Circle Scale",
+    Range = {0, 500},
+    Increment = 1,
+    Suffix = "",
+    CurrentValue = fov,
+    Flag = "SliderFOV",
     Callback = function(Value)
-        _G.TeamCheck = Value
+        fov = Value
+        if FOVring then
+            FOVring.Radius = fov
+        end
     end,
 })
 
-
-local AimPartDropdown = AimbotTab:CreateDropdown({
-    Name = "Aim Part",
-    Options = {"Head", "Torso"},
-    CurrentOption = _G.AimPart,
-    Flag = "Dropdown1",
-    Callback = function(Option)
-        _G.AimPart = Option
-    end,
-})
-
-
-local SensitivitySlider = AimbotTab:CreateSlider({
-    Name = "Sensitivity",
+AimbotTab:CreateSlider({
+    Name = "Smoothing",
     Range = {0, 1},
     Increment = 0.1,
     Suffix = "",
-    CurrentValue = _G.Sensitivity,
-    Flag = "Slider3",
+    CurrentValue = smoothing,
+    Flag = "SliderSmoothing",
     Callback = function(Value)
-        _G.Sensitivity = Value
+        smoothing = Value
     end,
 })
 
+AimbotTab:CreateSlider({
+    Name = "Sensitivity",
+    Range = {0, 3},
+    Increment = 0.1,
+    Suffix = "",
+    CurrentValue = sensitivity,
+    Flag = "SliderSensitivity",
+    Callback = function(Value)
+        sensitivity = Value
+    end,
+})
 
-local function AimbotLogic()
-    if HoldingRightClick then
-        local closestPlayer = GetClosestPlayer()
-        if closestPlayer then
-            AimAt(closestPlayer)
-        end
-    end
-end
+AimbotTab:CreateDropdown({
+    Name = "Aim Part",
+    Options = {"Head", "Torso"},
+    CurrentOption = "Head",
+    Flag = "DropdownAimPart",
+    Callback = function(Value)
+        aimPart = Value
+    end,
+})
 
-game:GetService("RunService").Heartbeat:Connect(AimbotLogic)
+print("Script Loaded")
