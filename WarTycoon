@@ -407,61 +407,13 @@ AimbotTab:CreateDropdown({
 local TeleportTab = Window:CreateTab("Teleport", nil) -- Title, Image
 local TeleportSection = TeleportTab:CreateSection("Teleport")
 
-local Dropdown = TeleportTab:CreateDropdown({
-    Name = "Teleport Players",
-    Options = {}, -- We will populate this dynamically
-    CurrentOption = {}, -- Current selection, initially empty
-    MultipleOptions = false,
-    Flag = "DropdownTeleport", -- Unique flag for configuration saving
-    Callback = function(Option)
-        -- The function that takes place when the selected option is changed
-        -- The variable (Option) is a table of strings for the currently selected option(s)
-
-        -- Check if any option is selected
-        if #Option > 0 then
-            local selectedPlayer = Option[1] -- We'll just teleport to the first selected player
-            local player = getPlayerByName(selectedPlayer) -- Function to get the player object by name
-
-            if player then
-                -- Teleport to the player's character
-                if player.Character and player.Character.PrimaryPart then
-                    game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(player.Character.PrimaryPart.CFrame)
-                    print("Teleported to player:", selectedPlayer)
-                else
-                    print("Player's character or primary part not found.")
-                end
-            else
-                print("Player not found:", selectedPlayer)
-            end
-        end
-    end,
+local Button = TeleportTab:CreateButton({
+   Name = "Alpha",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(-2517.64087, 48, 451.424683, 0.00817176327, 1.06269752e-07, 0.999966621, 1.75042363e-08, 1, -1.06416344e-07, -0.999966621, 1.8373262e-08, 0.00817176327)
+   end,
 })
-
--- Function to get player object by name
-local function getPlayerByName(name)
-    for _, player in ipairs(game.Players:GetPlayers()) do
-        if player.Name == name then
-            return player
-        end
-    end
-    return nil -- Player not found
-end
-
--- Function to populate dropdown options with player names
-local function populateDropdownOptions()
-    local options = {}
-    for _, player in ipairs(game.Players:GetPlayers()) do
-        table.insert(options, player.Name)
-    end
-    Dropdown:SetOptions(options)
-end
-
--- Initially populate dropdown options
-populateDropdownOptions()
-
--- Update dropdown options when a new player joins
-game.Players.PlayerAdded:Connect(populateDropdownOptions)
-
 
 
 print("Script Loaded")
