@@ -407,11 +407,140 @@ AimbotTab:CreateDropdown({
 local TeleportTab = Window:CreateTab("Teleport", nil) -- Title, Image
 local TeleportSection = TeleportTab:CreateSection("Teleport")
 
+
+local Button = TeleportTab:CreateButton({
+   Name = "Bravo",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(-2739.52856, 34.6850014, -669.597229, 0.342042685, 0, 0.939684391, 0, 1, 0, -0.939684391, 0, 0.342042685)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Tango",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(-982.199219, 34.6850014, 2609.85498, -0.707134247, 0, -0.707079291, 0, 1, 0, 0.707079291, 0, -0.707134247)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Zulu",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(-2390.09644, 34.6850014, 1448.25854, -0.258864403, 0, 0.965913713, 0, 1, 0, -0.965913713, 0, -0.258864403)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Golf",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(2031.34814, 34.6850014, -1537.97949, 0.707134247, -0, -0.707079291, 0, 1, -0, 0.707079291, 0, 0.707134247)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Lima",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(3036.64819, 34.6850014, 762.649963, 0, 0, -1, 0, 1, 0, 1, 0, 0)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Lima",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(3036.64819, 34.6850014, 762.649963, 0, 0, -1, 0, 1, 0, 1, 0, 0)
+   end,
+})
+
 local Button = TeleportTab:CreateButton({
    Name = "Alpha",
    Callback = function()
    local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-2517.64087, 48, 451.424683, 0.00817176327, 1.06269752e-07, 0.999966621, 1.75042363e-08, 1, -1.06416344e-07, -0.999966621, 1.8373262e-08, 0.00817176327)
+   rootpart.CFrame = CFrame.new(-2763.94824, 34.6850014, 412.049591, 0, 0, 1, 0, 1, -0, -1, 0, 0)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Omega",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(2892.73682, 34.6850014, 1660.63525, -0.258864403, 0, -0.965913713, 0, 1, 0, 0.965913713, 0, -0.258864403)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Charlie",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(-2363.6521, 34.6850014, -1508.4364, 0.499959469, 0, 0.866048813, 0, 1, 0, -0.866048813, 0, 0.499959469)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Delta",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(-1742.27612, 34.6850014, -2148.35376, 0.866007268, 0, 0.500031412, 0, 1, 0, -0.500031412, 0, 0.866007268)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Victor",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(-2385.74902, 34.6850014, 2411.34912, 0, 0, 1, 0, 1, -0, -1, 0, 0)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Hotel",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(2880.00732, 34.6850014, -1189.30591, 0.258864343, -0, -0.965913713, 0, 1, -0, 0.965913713, 0, 0.258864343)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Echo",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(-801.532959, 34.6850014, -2460.39551, 0.965929627, -0, -0.258804798, 0, 1, -0, 0.258804798, 0, 0.965929627)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Sierra",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(1262.71826, 34.6850014, 2755.2688, -0.906296611, 0, -0.422642082, 0, 1, 0, 0.422642082, 0, -0.906296611)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "FoxTrot",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(1147.84985, 34.6850014, -2140.04883, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Romeo",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(2210.61133, 34.6850014, 2412.08325, -0.965929747, 0, -0.258804798, 0, 1, 0, 0.258804798, 0, -0.965929747)
+   end,
+})
+
+local Button = TeleportTab:CreateButton({
+   Name = "Kilo",
+   Callback = function()
+   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+   rootpart.CFrame = CFrame.new(3024.54883, 34.6850014, -318.749939, 0, 0, -1, 0, 1, 0, 1, 0, 0)
    end,
 })
 
