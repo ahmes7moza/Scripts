@@ -404,4 +404,55 @@ AimbotTab:CreateDropdown({
     end,
 })
 
+local TeleportTab = Window:CreateTab("Teleport", nil) -- Title, Image
+local TeleportSection = TeleportTab:CreateSection("Teleport")
+
+local Dropdown = TeleportTab:CreateDropdown({
+    Name = "Teleport Players",
+    Options = {}, 
+    CurrentOption = {}, 
+    MultipleOptions = false,
+    Flag = "DropdownTeleportPlayer", 
+    Callback = function(Option)
+        
+        if #Option > 0 then
+            local selectedPlayer = Option[1] 
+            local player = getPlayerByName(selectedPlayer) 
+
+            if player then
+                -- Teleport to the player's character
+                game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(player.Character.PrimaryPart.CFrame)
+            else
+                print("Player not found.")
+            end
+        end
+    end,
+})
+
+-- Function to get player object by name
+local function getPlayerByName(name)
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player.Name == name then
+            return player
+        end
+    end
+    return nil -- Player not found
+end
+
+-- Function to populate dropdown options with player names
+local function populateDropdownOptions()
+    local options = {}
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        table.insert(options, player.Name)
+    end
+    Dropdown:SetOptions(options)
+end
+
+-- Initially populate dropdown options
+populateDropdownOptions()
+
+-- Update dropdown options when a new player joins
+game.Players.PlayerAdded:Connect(populateDropdownOptions)
+
+
 print("Script Loaded")
