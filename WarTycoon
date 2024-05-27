@@ -41,12 +41,13 @@ local Window = Rayfield:CreateWindow({
 local MainTab = Window:CreateTab("Main")
 local ESPTab = Window:CreateTab("ESP")
 local AimbotTab = Window:CreateTab("Aimbot")
-local TeleportTab = Window:CreateTab("Teleport", nil)
+local TeleportTab = Window:CreateTab("Teleport")
+local FarmTab = Window:CreateTab("Farm")
 
 -- Walk Speed and Jump Power Sliders
 MainTab:CreateSlider({
     Name = "Walk Speed",
-    Range = {0, 200},
+    Range = {16, 200},
     Increment = 1,
     Suffix = "Speed",
     CurrentValue = 16,
@@ -58,7 +59,7 @@ MainTab:CreateSlider({
 
 MainTab:CreateSlider({
     Name = "Jump Power",
-    Range = {0, 200},
+    Range = {50, 200},
     Increment = 1,
     Suffix = "Jump",
     CurrentValue = 50,
