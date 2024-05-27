@@ -408,141 +408,77 @@ local TeleportTab = Window:CreateTab("Teleport", nil) -- Title, Image
 local TeleportSection = TeleportTab:CreateSection("Teleport")
 
 
-local Button = TeleportTab:CreateButton({
-   Name = "Bravo",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-2739.52856, 60.6850014, -669.597229, 0.342042685, 0, 0.939684391, 0, 1, 0, -0.939684391, 0, 0.342042685)
+local teleportLocations = {
+    "Bravo",
+    "Tango",
+    "Zulu",
+    "Golf",
+    "Lima",
+    "Alpha",
+    "Omega",
+    "Charlie",
+    "Delta",
+    "Victor",
+    "Hotel",
+    "Echo",
+    "Sierra",
+    "FoxTrot",
+    "Romeo",
+    "Kilo"
+}
+
+local selectedLocation = teleportLocations[1] -- Default to the first location
+
+local Dropdown = TeleportTab:CreateDropdown({
+   Name = "Teleport Locations",
+   Options = teleportLocations,
+   CurrentOption = {selectedLocation},
+   MultipleOptions = false,
+   Flag = "TeleportDropdown", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Option)
+       selectedLocation = Option[1] -- Update the selected location when the dropdown option changes
    end,
 })
 
 local Button = TeleportTab:CreateButton({
-   Name = "Tango",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-982.199219, 60.6850014, 2609.85498, -0.707134247, 0, -0.707079291, 0, 1, 0, 0.707079291, 0, -0.707134247)
-   end,
+    Name = "Teleport",
+    Callback = function()
+        local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        -- Lookup the coordinates for the selected location and teleport the player
+        if selectedLocation == "Bravo" then
+            rootpart.CFrame = CFrame.new(-2739.52856, 60, -669.597229)
+        elseif selectedLocation == "Tango" then
+            rootpart.CFrame = CFrame.new(-982.199219, 60, 2609.85498)
+        elseif selectedLocation == "Zulu" then
+            rootpart.CFrame = CFrame.new(-2390.09644, 60, 1448.25854)
+        elseif selectedLocation == "Golf" then
+            rootpart.CFrame = CFrame.new(2031.34814, 60, -1537.97949)
+        elseif selectedLocation == "Lima" then
+            rootpart.CFrame = CFrame.new(3036.64819, 60, 762.649963)
+        elseif selectedLocation == "Alpha" then
+            rootpart.CFrame = CFrame.new(-2763.94824, 60, 412.049591)
+        elseif selectedLocation == "Omega" then
+            rootpart.CFrame = CFrame.new(2892.73682, 60, 1660.63525)
+        elseif selectedLocation == "Charlie" then
+            rootpart.CFrame = CFrame.new(-2363.6521, 60, -1508.4364)
+        elseif selectedLocation == "Delta" then
+            rootpart.CFrame = CFrame.new(-1742.27612, 60, -2148.35376)
+        elseif selectedLocation == "Victor" then
+            rootpart.CFrame = CFrame.new(-2385.74902, 60, 2411.34912)
+        elseif selectedLocation == "Hotel" then
+            rootpart.CFrame = CFrame.new(2880.00732, 60, -1189.30591)
+        elseif selectedLocation == "Echo" then
+            rootpart.CFrame = CFrame.new(-801.532959, 60, -2460.39551)
+        elseif selectedLocation == "Sierra" then
+            rootpart.CFrame = CFrame.new(1262.71826, 60, 2755.2688)
+        elseif selectedLocation == "FoxTrot" then
+            rootpart.CFrame = CFrame.new(1147.84985, 60, -2140.04883)
+        elseif selectedLocation == "Romeo" then
+            rootpart.CFrame = CFrame.new(2210.61133, 60, 2412.08325)
+        elseif selectedLocation == "Kilo" then
+            rootpart.CFrame = CFrame.new(3024.54883, 60, -318.749939)
+        end
+    end,
 })
-
-local Button = TeleportTab:CreateButton({
-   Name = "Zulu",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-2390.09644, 60.6850014, 1448.25854, -0.258864403, 0, 0.965913713, 0, 1, 0, -0.965913713, 0, -0.258864403)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Golf",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(2031.34814, 60.6850014, -1537.97949, 0.707134247, -0, -0.707079291, 0, 1, -0, 0.707079291, 0, 0.707134247)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Lima",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(3036.64819, 60.6850014, 762.649963, 0, 0, -1, 0, 1, 0, 1, 0, 0)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Lima",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(3036.64819, 60.6850014, 762.649963, 0, 0, -1, 0, 1, 0, 1, 0, 0)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Alpha",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-2763.94824, 60.6850014, 412.049591, 0, 0, 1, 0, 1, -0, -1, 0, 0)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Omega",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(2892.73682, 60.6850014, 1660.63525, -0.258864403, 0, -0.965913713, 0, 1, 0, 0.965913713, 0, -0.258864403)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Charlie",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-2363.6521, 60.6850014, -1508.4364, 0.499959469, 0, 0.866048813, 0, 1, 0, -0.866048813, 0, 0.499959469)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Delta",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-1742.27612, 60.6850014, -2148.35376, 0.866007268, 0, 0.500031412, 0, 1, 0, -0.500031412, 0, 0.866007268)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Victor",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-2385.74902, 60.6850014, 2411.34912, 0, 0, 1, 0, 1, -0, -1, 0, 0)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Hotel",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(2880.00732, 60.6850014, -1189.30591, 0.258864343, -0, -0.965913713, 0, 1, -0, 0.965913713, 0, 0.258864343)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Echo",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(-801.532959, 60.6850014, -2460.39551, 0.965929627, -0, -0.258804798, 0, 1, -0, 0.258804798, 0, 0.965929627)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Sierra",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(1262.71826, 60.6850014, 2755.2688, -0.906296611, 0, -0.422642082, 0, 1, 0, 0.422642082, 0, -0.906296611)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "FoxTrot",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(1147.84985, 60.6850014, -2140.04883, 1, 0, 0, 0, 1, 0, 0, 0, 1)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Romeo",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(2210.61133, 60.6850014, 2412.08325, -0.965929747, 0, -0.258804798, 0, 1, 0, 0.258804798, 0, -0.965929747)
-   end,
-})
-
-local Button = TeleportTab:CreateButton({
-   Name = "Kilo",
-   Callback = function()
-   local rootpart = game.Players.LocalPlayer.Character.HumanoidRootPart
-   rootpart.CFrame = CFrame.new(3024.54883, 60.6850014, -318.749939, 0, 0, -1, 0, 1, 0, 1, 0, 0)
-   end,
-})
-
 
 print("Script Loaded")
