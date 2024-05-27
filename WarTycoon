@@ -409,21 +409,29 @@ local TeleportSection = TeleportTab:CreateSection("Teleport")
 
 local Dropdown = TeleportTab:CreateDropdown({
     Name = "Teleport Players",
-    Options = {}, 
-    CurrentOption = {}, 
+    Options = {}, -- We will populate this dynamically
+    CurrentOption = {}, -- Current selection, initially empty
     MultipleOptions = false,
-    Flag = "DropdownTeleportPlayer", 
+    Flag = "DropdownTeleport", -- Unique flag for configuration saving
     Callback = function(Option)
-        
+        -- The function that takes place when the selected option is changed
+        -- The variable (Option) is a table of strings for the currently selected option(s)
+
+        -- Check if any option is selected
         if #Option > 0 then
-            local selectedPlayer = Option[1] 
-            local player = getPlayerByName(selectedPlayer) 
+            local selectedPlayer = Option[1] -- We'll just teleport to the first selected player
+            local player = getPlayerByName(selectedPlayer) -- Function to get the player object by name
 
             if player then
                 -- Teleport to the player's character
-                game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(player.Character.PrimaryPart.CFrame)
+                if player.Character and player.Character.PrimaryPart then
+                    game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(player.Character.PrimaryPart.CFrame)
+                    print("Teleported to player:", selectedPlayer)
+                else
+                    print("Player's character or primary part not found.")
+                end
             else
-                print("Player not found.")
+                print("Player not found:", selectedPlayer)
             end
         end
     end,
@@ -453,6 +461,7 @@ populateDropdownOptions()
 
 -- Update dropdown options when a new player joins
 game.Players.PlayerAdded:Connect(populateDropdownOptions)
+
 
 
 print("Script Loaded")
