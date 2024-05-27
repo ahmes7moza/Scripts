@@ -37,9 +37,11 @@ local Window = Rayfield:CreateWindow({
     }
 })
 
+--taps
 local MainTab = Window:CreateTab("Main")
 local ESPTab = Window:CreateTab("ESP")
 local AimbotTab = Window:CreateTab("Aimbot")
+local TeleportTab = Window:CreateTab("Teleport", nil)
 
 -- Walk Speed and Jump Power Sliders
 MainTab:CreateSlider({
@@ -412,10 +414,6 @@ AimbotTab:CreateDropdown({
         aimPart = Value
     end,
 })
-
-local TeleportTab = Window:CreateTab("Teleport", nil) -- Title, Image
-local TeleportSection = TeleportTab:CreateSection("Teleport")
-
 
 local teleportLocations = {
     "Bravo",
