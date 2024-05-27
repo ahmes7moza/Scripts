@@ -98,6 +98,7 @@ MainTab:CreateToggle({
 local ESPEnabled = false
 local ESPLabels = {}
 local ESPColor = Color3.fromRGB(255, 255, 255)
+local ShowDistance = false  -- Added this line to track the distance display state
 
 local function CreateESPLabel(Player)
     local Label = Drawing.new("Text")
@@ -113,13 +114,13 @@ local function CreateESPLabel(Player)
     return Label
 end
 
-local function UpdateESPLabel(Label, Player, ShowDistance)
+local function UpdateESPLabel(Label, Player)
     local Character = Player.Character
     if Character and Character:FindFirstChild("HumanoidRootPart") then
         local Head = Character:FindFirstChild("HumanoidRootPart")
         local ScreenPosition = workspace.CurrentCamera:WorldToViewportPoint(Head.Position)
         if ScreenPosition.Z >= 0 then
-            if ShowDistance then
+            if ShowDistance then  -- Modified this line to check the ShowDistance variable
                 local distance = (game.Players.LocalPlayer:DistanceFromCharacter(Head.Position))
                 Label.Text = Player.Name .. " [" .. math.floor(distance) .. "m]"
             else
@@ -138,7 +139,6 @@ end
 function ESP:start()
     ESP:stop()
     ESP.loop = game:GetService("RunService").Heartbeat:Connect(function()
-        local ShowDistance = ESP.ShowDistance
         for _, Player in ipairs(game.Players:GetPlayers()) do
             if Player ~= game.Players.LocalPlayer then
                 local Label = ESPLabels[Player]
@@ -146,7 +146,7 @@ function ESP:start()
                     Label = CreateESPLabel(Player)
                     ESPLabels[Player] = Label
                 end
-                UpdateESPLabel(Label, Player, ShowDistance)
+                UpdateESPLabel(Label, Player)
             end
         end
     end)
@@ -174,6 +174,15 @@ ESPTab:CreateToggle({
         else
             ESP:stop()
         end
+    end,
+})
+
+ESPTab:CreateToggle({
+    Name = "Show Distance",  -- Added this block for the new toggle
+    CurrentValue = false,
+    Flag = "ToggleDistance",
+    Callback = function(Value)
+        ShowDistance = Value
     end,
 })
 
