@@ -1,5 +1,10 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
+--some locals
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidrootpart = character:WaitForChild("HumanoidRootPart")
+
 -- ESP and Aimbot settings
 local ESP = {Enabled = false, ShowDistance = false, highlights = {}}
 local AimbotFovEnabled = false
@@ -416,6 +421,8 @@ AimbotTab:CreateDropdown({
     end,
 })
 
+--teleports
+local TeleportSection = TeleportTab:CreateSection("Fucthions")
 local teleportLocations = {
     "Bravo",
     "Tango",
@@ -488,5 +495,34 @@ local Button = TeleportTab:CreateButton({
         end
     end,
 })
+
+local TeleportSection = TeleportTab:CreateSection("Others")
+local Button = TeleportTab:CreateButton({
+    Name = "Capture Point",
+    Callback = function()
+        humanoidrootpart.CFrame = game.Workspace.Beams.CapturePoint1.CFrame
+    end,
+ })
+
+ local Button = TeleportTab:CreateButton({
+    Name = "AirDrop",
+    Callback = function()
+        for _,v in pairs(Workspace.Beams:GetChildren()) do
+            if(v.Name:find("Airdrop_")) then humanoidrootpart.CFrame = v.CFrame; end;
+        end;
+    end,
+ })
+
+ local Button = TeleportTab:CreateButton({
+    Name = "Oils",
+    Callback = function()
+        for _, v in pairs(Workspace.Beams:GetChildren()) do
+            if(v.Name:find("Warehouse")) then
+                    humanoidrootpart.CFrame = Workspace.Beams[v.Name].CFrame;
+                break;
+            end;
+        end;
+    end,
+ })
 
 print("Script Loaded")
