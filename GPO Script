@@ -1,0 +1,214 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Vertex Hub " .. Fluent.Version,
+    SubTitle = "by lg0_",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftAlt
+})
+
+-- Tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Teleport = Window:AddTab({ Title = "Teleport", Icon = "" }),
+    ESP = Window:AddTab({ Title = "ESP", Icon = "" }),
+    Br = Window:AddTab({ Title = "Br", Icon = "" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+-- Jumping
+local Player = game.Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+local JumpHeight = 50  -- Default JumpHeight
+
+local infjump = false
+
+local JumpInfToggle = Tabs.Br:AddToggle("InfJumpToggle", {
+    Title = "Infinite Jump",
+    Default = false,
+    Callback = function(Value)
+        infjump = Value
+    end
+})
+
+--NoClip
+local NoClipToggle = Tabs.Br:AddToggle("NoClipToggle", {
+    Title = "NoClip",
+    Default = false,
+    Callback = function(Value)
+        NoClipEnabled = Value
+        if Value then
+            game:GetService("RunService").Stepped:Connect(function()
+                if NoClipEnabled then
+                    for _, Part in ipairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                        if Part:IsA("BasePart") then
+                            Part.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            for _, Part in ipairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                if Part:IsA("BasePart") then
+                    Part.CanCollide = true
+                end
+            end
+        end
+    end
+})
+
+--Geppo
+local GeppoToggle = Tabs.Br:AddToggle("GeppoToggle", {
+    Title = "Geppo",
+    Default = false,
+    Callback = function(Value)
+        local player = game.Players.LocalPlayer
+		local replicatedStorage = game:GetService("ReplicatedStorage")
+
+		local statsFolder = replicatedStorage:FindFirstChild("Stats"..player.Name)
+		if statsFolder then
+			local skillsFolder = statsFolder:FindFirstChild("Skills")
+			if skillsFolder then
+				local skyWalkValue = skillsFolder:FindFirstChild("skyWalk")
+				if skyWalkValue and skyWalkValue:IsA("BoolValue") then
+					skyWalkValue.Value = Value
+				end
+			end
+		end
+    end
+})
+
+--HitBox
+local HitBoxToggle = Tabs.Br:AddToggle("HitBoxToggle", {
+    Title = "HitBox",
+    Default = false,
+    Callback = function(Value)
+        if Value  then
+			while wait(5) do
+				for _,player in ipairs(game:GetService("Players"):GetChildren()) do
+					local npc = player.Character
+					if npc:FindFirstChild("HumanoidRootPart") and npc.HumanoidRootPart.Size ~= Vector3.new(15,15,15) and npc.Name ~= game.Players.LocalPlayer.Name then
+						local Hum = npc.HumanoidRootPart
+						Hum.Transparency = 0.8
+						Hum.CanCollide = false
+						Hum.Size = Vector3.new(21,21,21)
+					end
+				end
+			end
+		else
+			for _,player in ipairs(game:GetService("Players"):GetChildren()) do
+				local npc = player.Character
+				if npc:FindFirstChild("HumanoidRootPart") and npc.HumanoidRootPart.Size ~= Vector3.new(15,15,15) and npc.Name ~= game.Players.LocalPlayer.Name then
+					local Hum = npc.HumanoidRootPart
+					Hum.Transparency = 1
+					Hum.CanCollide = false
+					Hum.Size = Vector3.new(2, 1.96, 1)
+				end
+			end
+		end
+    end
+})
+
+-- WalkSpeed
+local LGSpeed = 16  -- Default WalkSpeed
+local WalkSpeedToggle = true  -- Assuming this is a toggle for WalkSpeed modification
+
+local WalkSlider = Tabs.Br:AddSlider("WalkSpeedSlider", {
+    Title = "WalkSpeed",
+    Description = "Adjust player's walk speed",
+    Default = LGSpeed,
+    Min = 16,
+    Max = 100,
+    Rounding = 1,
+    Callback = function(Value)
+        LGSpeed = Value
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = LGSpeed
+    end
+})
+
+--JumpPower
+local JumpSlider = Tabs.Br:AddSlider("JumpPowerSlider", {
+    Title = "JumpPower",
+    Description = "Adjust player's jump power",
+    Default = JumpHeight,
+    Min = 50,
+    Max = 150,
+    Rounding = 1,
+    Callback = function(Value)
+        JumpHeight = Value
+    end
+})
+
+-- FOV
+local amount = 70  -- Default FOV
+
+local FovSlider = Tabs.Br:AddSlider("FovSlider", {
+    Title = "FOV",
+    Description = "Adjust Field of View",
+    Default = amount,
+    Min = 70,
+    Max = 120,
+    Rounding = 1,
+    Callback = function(Value)
+        amount = Value
+        game.Workspace.CurrentCamera.FieldOfView = amount
+    end
+})
+
+--underGround
+local UnderGroundKeybind = Tabs.Br:AddKeybind("UnderGroundKeybind", {
+    Title = "UnderGround",
+    Description = "zehahah",
+    Mode = "Toggle", -- Always, Toggle, Hold
+    Default = "G", 
+    Callback = function(Value)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0,-10,0))
+    end
+})
+
+-- Main loop for WalkSpeed modification
+spawn(function()
+    while true do
+        wait()
+        if WalkSpeedToggle then
+            pcall(function()
+                local moveDirection = Player.Character.Humanoid.MoveDirection
+                local moveVector = calculateRawMoveVector(Player.Character.Humanoid, moveDirection)
+                Player.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(moveVector.X, 0, moveVector.Z) * LGSpeed + Vector3.new(0, Player.Character.HumanoidRootPart.AssemblyLinearVelocity.Y, 0)
+            end)
+        end
+    end
+end)
+
+-- Function to calculate movement vector
+local function calculateRawMoveVector(humanoid, moveDirection)
+    local camera = game.Workspace.CurrentCamera
+    if not camera then
+        return moveDirection
+    end
+
+    local cameraCFrame = camera.CFrame
+
+    local c, s
+    local _, _, _, R00, R01, R02, _, _, R12, _, _, R22 = cameraCFrame:GetComponents()
+    if R12 < 1 and R12 > -1 then
+        c = R22
+        s = R02
+    else
+        c = R00
+        s = -R01 * math.sign(R12)
+    end
+
+    local norm = math.sqrt(c * c + s * s)
+    return Vector3.new(
+        (c * moveDirection.X + s * moveDirection.Z) / norm,
+        0,
+        (c * moveDirection.Z - s * moveDirection.X) / norm
+    )
+end
+
+
+
