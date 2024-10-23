@@ -210,5 +210,122 @@ local function calculateRawMoveVector(humanoid, moveDirection)
     )
 end
 
+local ESPEnabled = false
+local ShowHealth = false
+local ShowName = false
+local ShowDistance = false
 
+-- Toggles for ESP options
+local ESPToggle = Tabs.ESP:AddToggle("ESPEnabled", {
+    Title = "Enable ESP",
+    Default = false,
+    Callback = function(Value)
+        ESPEnabled = Value
+    end
+})
 
+local HealthToggle = Tabs.ESP:AddToggle("ShowHealth", {
+    Title = "Show Health",
+    Default = false,
+    Callback = function(Value)
+        ShowHealth = Value
+    end
+})
+
+local NameToggle = Tabs.ESP:AddToggle("ShowName", {
+    Title = "Show Name",
+    Default = false,
+    Callback = function(Value)
+        ShowName = Value
+    end
+})
+
+local DistanceToggle = Tabs.ESP:AddToggle("ShowDistance", {
+    Title = "Show Distance",
+    Default = false,
+    Callback = function(Value)
+        ShowDistance = Value
+    end
+})
+
+-- ESP Logic
+local function createESP(player)
+    local Billboard = Instance.new("BillboardGui", player.Character.Head)
+    Billboard.Size = UDim2.new(0, 100, 0, 40)
+    Billboard.StudsOffset = Vector3.new(0, 2, 0)
+    Billboard.AlwaysOnTop = true
+
+    local Frame = Instance.new("Frame", Billboard)
+    Frame.Size = UDim2.new(1, 0, 1, 0)
+    Frame.BackgroundTransparency = 1
+
+    -- Name Label
+    local NameLabel = Instance.new("TextLabel", Frame)
+    NameLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    NameLabel.BackgroundTransparency = 1
+    NameLabel.TextColor3 = Color3.new(1, 1, 1)
+    NameLabel.TextScaled = true
+    NameLabel.Text = ""
+
+    -- Health Label
+    local HealthLabel = Instance.new("TextLabel", Frame)
+    HealthLabel.Position = UDim2.new(0, 0, 0.3, 0)
+    HealthLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    HealthLabel.BackgroundTransparency = 1
+    HealthLabel.TextColor3 = Color3.new(0, 1, 0)
+    HealthLabel.TextScaled = true
+    HealthLabel.Text = ""
+
+    -- Distance Label
+    local DistanceLabel = Instance.new("TextLabel", Frame)
+    DistanceLabel.Position = UDim2.new(0, 0, 0.6, 0)
+    DistanceLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    DistanceLabel.BackgroundTransparency = 1
+    DistanceLabel.TextColor3 = Color3.new(0, 0.5, 1)
+    DistanceLabel.TextScaled = true
+    DistanceLabel.Text = ""
+
+    -- Update ESP values dynamically
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if ESPEnabled then
+            if ShowName then
+                NameLabel.Text = player.Name
+            else
+                NameLabel.Text = ""
+            end
+
+            if ShowHealth and player.Character:FindFirstChild("Humanoid") then
+                HealthLabel.Text = "HP: " .. math.floor(player.Character.Humanoid.Health)
+            else
+                HealthLabel.Text = ""
+            end
+
+            if ShowDistance then
+                local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                DistanceLabel.Text = "Dist: " .. math.floor(distance) .. " studs"
+            else
+                DistanceLabel.Text = ""
+            end
+        else
+            NameLabel.Text = ""
+            HealthLabel.Text = ""
+            DistanceLabel.Text = ""
+        end
+    end)
+end
+
+-- Apply ESP to all players
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+        createESP(player)
+    end
+end
+
+-- Update ESP when new players join
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        if player ~= game.Players.LocalPlayer and player.Character:FindFirstChild("Head") then
+            createESP(player)
+        end
+    end)
+end)
