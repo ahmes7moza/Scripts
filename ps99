@@ -18,7 +18,7 @@ Window:SelectTab(1)
 
 local EventFarm = false
 local TeleportFarm = false
-
+local NoClip = false
 local AntiAFK = false
 
 Tabs.Main:AddToggle("AntiAFKToggle", {
@@ -42,6 +42,21 @@ Tabs.Main:AddToggle("AntiAFKToggle", {
     end
 })
 
+-- Add Toggle for No-Clip
+local ToggleNoClip = Tabs.Main:AddToggle("NoClip", { 
+    Title = "Enable No-Clip",
+    Description = "Toggle no-clip mode on or off.",
+    Default = false,
+    Callback = function(Value)
+        NoClip = Value
+        if NoClip then
+            enableNoClip()
+        else
+            disableNoClip()
+        end
+    end
+})
+--[[
 -- Toggle for deleting blocks
 local ToggleDelete = Tabs.Main:AddToggle("Event", { 
     Title = "Delete Blocks in Event",
@@ -54,7 +69,7 @@ local ToggleDelete = Tabs.Main:AddToggle("Event", {
         end
     end
 })
-
+]]--
 -- Toggle for teleporting to the nearest 'B'
 local ToggleTeleport = Tabs.Main:AddToggle("Teleport", { 
     Title = "Teleport to 'B'",
@@ -68,6 +83,40 @@ local ToggleTeleport = Tabs.Main:AddToggle("Teleport", {
     end
 })
 
+-- Function to enable no-clip
+function enableNoClip()
+    spawn(function()
+        while NoClip do
+            local player = game:GetService("Players").LocalPlayer
+            local character = player.Character
+            if character and character:FindFirstChild("Humanoid") then
+                for _, part in ipairs(character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                    part.CanCollide = false -- Disable collision for all parts of the character
+                    end
+                end
+            end
+        wait(0.3)
+        end   
+    end)
+end
+
+-- Function to disable no-clip
+function disableNoClip()
+    spawn(function()
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("Humanoid") then
+            for _, part in ipairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true -- Enable collision for all parts of the character
+                end
+            end
+        end
+    end)
+end
+
+--[[
 -- Function to delete blocks except those containing 'B'
 function startAutoDelete()
     spawn(function()
@@ -100,43 +149,41 @@ function startAutoDelete()
         end
     end)
 end
-
--- Function to delete blocks within a 10-stud radius around the player, except those containing 'B'
-function startAutoDelete()
+]]--
+-- Function to teleport to the nearest 'B' part
+function startTeleport()
     spawn(function()
         local player = game:GetService("Players").LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local rootPart = character:WaitForChild("HumanoidRootPart")
-        local radius = 10  -- Radius for deletion
-
-        while EventFarm do
-            local parentFolder = workspace:FindFirstChild("__THINGS") and workspace.__THINGS:FindFirstChild("BlockWorlds")
+        while TeleportFarm do
+            local parentFolder = workspace:FindFirstChild("__THINGS")
+            and workspace.__THINGS:FindFirstChild("BlockWorlds")
             
             -- Loop through blocks 1 to 8
             for i = 1, 8 do
                 local blockFolder = parentFolder:FindFirstChild("Blocks_" .. i)
-                if blockFolder then
-                    for _, obj in ipairs(blockFolder:GetChildren()) do
-                        -- Check if this object has a descendant named "B"
-                        local hasB = false
-                        for _, descendant in ipairs(obj:GetDescendants()) do
-                            if descendant:IsA("BasePart") and descendant.Name == "B" then
-                                hasB = true
-                                break
-                            end
-                        end
-                        
-                        -- If no "B" part is found and the block is within 10 studs, delete it
-                        if not hasB then
-                            local distance = (rootPart.Position - obj.PrimaryPart.Position).Magnitude
-                            if distance <= radius then
-                                obj:Destroy()
+                if blockFolder and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local rootPart = player.Character.HumanoidRootPart
+                    local closestB = nil
+                    local minDistance = math.huge
+                    
+                    -- Find the nearest 'B'
+                    for _, obj in ipairs(blockFolder:GetDescendants()) do
+                        if obj:IsA("BasePart") and obj.Name == "B" then
+                            local distance = (rootPart.Position - obj.Position).Magnitude
+                            if distance < minDistance then
+                                minDistance = distance
+                                closestB = obj
                             end
                         end
                     end
+
+                    -- Teleport to the closest 'B'
+                    if closestB then
+                        rootPart.CFrame = CFrame.new(closestB.Position + Vector3.new(0, 6, 0)) -- 5 studs above 'B'
+                    end
                 end
             end
-            wait(0.1)
+            wait(0.5) -- Wait before checking again
         end
     end)
 end
