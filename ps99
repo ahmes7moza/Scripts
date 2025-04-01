@@ -16,7 +16,44 @@ local Tabs = {
 
 Window:SelectTab(1)
 
+local EventFarm = false
 local TeleportFarm = false
+
+local AntiAFK = false
+
+Tabs.Main:AddToggle("AntiAFKToggle", {
+    Title = "Anti-AFK",
+    Description = "Prevents AFK kick",
+    Default = false,
+    Callback = function(Value)
+        AntiAFK = Value
+        if AntiAFK then
+            spawn(function()
+                while AntiAFK do
+                    game:GetService("VirtualUser"):CaptureController()
+                    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+
+                    print("Anti-AFK activated!")
+
+                    wait(30) -- Runs every 30 seconds
+                end
+            end)
+        end
+    end
+})
+
+-- Toggle for deleting blocks
+local ToggleDelete = Tabs.Main:AddToggle("Event", { 
+    Title = "Delete Blocks in Event",
+    Description = "Automatically deletes blocks except those containing 'B'",
+    Default = false,
+    Callback = function(Value)
+        EventFarm = Value
+        if EventFarm then
+            startAutoDelete()
+        end
+    end
+})
 
 -- Toggle for teleporting to the nearest 'B'
 local ToggleTeleport = Tabs.Main:AddToggle("Teleport", { 
@@ -31,40 +68,75 @@ local ToggleTeleport = Tabs.Main:AddToggle("Teleport", {
     end
 })
 
--- Function to teleport to the nearest 'B' part
-function startTeleport()
+-- Function to delete blocks except those containing 'B'
+function startAutoDelete()
     spawn(function()
-        local player = game:GetService("Players").LocalPlayer
-        while TeleportFarm do
+        while EventFarm do
             local parentFolder = workspace:FindFirstChild("__THINGS")
             and workspace.__THINGS:FindFirstChild("BlockWorlds")
             
             -- Loop through blocks 1 to 8
             for i = 1, 8 do
                 local blockFolder = parentFolder:FindFirstChild("Blocks_" .. i)
-                if blockFolder and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local rootPart = player.Character.HumanoidRootPart
-                    local closestB = nil
-                    local minDistance = math.huge
-                    
-                    -- Find the nearest 'B'
-                    for _, obj in ipairs(blockFolder:GetDescendants()) do
-                        if obj:IsA("BasePart") and obj.Name == "B" then
-                            local distance = (rootPart.Position - obj.Position).Magnitude
-                            if distance < minDistance then
-                                minDistance = distance
-                                closestB = obj
+                if blockFolder then
+                    for _, obj in ipairs(blockFolder:GetChildren()) do
+                        -- Check if this object has a descendant named "B"
+                        local hasB = false
+                        for _, descendant in ipairs(obj:GetDescendants()) do
+                            if descendant:IsA("BasePart") and descendant.Name == "B" then
+                                hasB = true
+                                break
                             end
                         end
-                    end
-
-                    -- Teleport to the closest 'B'
-                    if closestB then
-                        rootPart.CFrame = CFrame.new(closestB.Position + Vector3.new(0, 5, 0)) -- 5 studs above 'B'
+                        
+                        -- If no "B" part is found, delete the object
+                        if not hasB then
+                            obj:Destroy()
+                        end
                     end
                 end
             end
-            wait(0.5) -- Wait before checking again
+            wait(0.1)
+        end
+    end)
+end
+
+-- Function to delete blocks within a 10-stud radius around the player, except those containing 'B'
+function startAutoDelete()
+    spawn(function()
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local rootPart = character:WaitForChild("HumanoidRootPart")
+        local radius = 10  -- Radius for deletion
+
+        while EventFarm do
+            local parentFolder = workspace:FindFirstChild("__THINGS") and workspace.__THINGS:FindFirstChild("BlockWorlds")
+            
+            -- Loop through blocks 1 to 8
+            for i = 1, 8 do
+                local blockFolder = parentFolder:FindFirstChild("Blocks_" .. i)
+                if blockFolder then
+                    for _, obj in ipairs(blockFolder:GetChildren()) do
+                        -- Check if this object has a descendant named "B"
+                        local hasB = false
+                        for _, descendant in ipairs(obj:GetDescendants()) do
+                            if descendant:IsA("BasePart") and descendant.Name == "B" then
+                                hasB = true
+                                break
+                            end
+                        end
+                        
+                        -- If no "B" part is found and the block is within 10 studs, delete it
+                        if not hasB then
+                            local distance = (rootPart.Position - obj.PrimaryPart.Position).Magnitude
+                            if distance <= radius then
+                                obj:Destroy()
+                            end
+                        end
+                    end
+                end
+            end
+            wait(0.1)
         end
     end)
 end
